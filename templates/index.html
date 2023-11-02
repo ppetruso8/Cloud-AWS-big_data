@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Census Population Statistics</title>
+    </head>
+
+    <body>
+        <header>
+            <h1>Census Population Statistics</h1>
+        </header>
+    
+
+        <nav>
+            <ul>
+                
+            </ul> 
+        </nav>
+
+        <main>
+            <table>
+                <tr>
+                    <th>Year</th>
+                    <th>Age Group</th>
+                    <th>Gender</th>
+                    <th>Population</th>
+                </tr>
+                {% for value in stats %}
+                <tr>
+                    <td>{{ value.year }}</td>
+                    <td>{{ value.age }}</td>
+                    <td>{{ value.gender }}</td>
+                    <td>{{ value.population }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            
+        </main>
+
+        <footer>
+            <p>
+                <small>The website was created by <i>Petra Petrusova</i>.</small>
+            </p>
+            <!--
+            <p>
+                <small>The font is made available for free use on <a href="https://fonts.google.com/">https://fonts.google.com/</a>.</small>
+            </p>-->
+            
+            <p>
+                <small>Statistics: <a href="https://data.cso.ie/table/FY002">Central Statistics Office</a></small>
+            </p>
+            
+        </footer>
+
+    </body>
+</html>
