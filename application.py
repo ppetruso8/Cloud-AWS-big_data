@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 import requests
+import pymysql
 
+'''Application'''
 application = app = Flask(__name__)
 
 @app.route("/")
@@ -44,6 +46,29 @@ def index():
         
         
     avg_population = get_avg_population(population_by_year)
+
+    '''DB'''
+    connection = pymysql.connect(host = 'awseb-e-tvrufpsf75-stack-awsebrdsdatabase-wwiq7tqabdft.csqu5agax8wn.eu-west-1.rds.amazonaws.com',
+                            port = 3306,
+                            user = 'ppetruso',
+                            password = '1234512345',
+                            database = 'ebdb'
+                            )
+    
+
+    cursor = connection.cursor()
+
+    for yr in population_by_year:
+        try: 
+            cursor.execute("""INSERT INTO population_by_year (year, total_population, male_population, female_population)
+                            VALUES (%s, %s, %s, %s);""", (yr['year'], yr['population'], yr['male'], yr['female'])
+                        )
+            connection.commit()
+        except pymysql.Error as e:
+            print("Error: " + str(e))
+
+    cursor.close()
+    connection.close()
     
     return render_template("index.html", population_by_year=population_by_year)
 
@@ -53,7 +78,6 @@ def get_avg_population(population_list):
         total_population += (value["population"])
     avg_population = total_population / len(population_list)
     return int(avg_population)
-
 
 
 if __name__ == "__main__":
