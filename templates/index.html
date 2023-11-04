@@ -18,19 +18,20 @@
         </nav>
 
         <main>
+            
             <table>
                 <tr>
                     <th>Year</th>
-                    <th>Age Group</th>
-                    <th>Gender</th>
-                    <th>Population</th>
+                    <th>Total Population</th>
+                    <th>Total Male</th>
+                    <th>Total Female</th>
                 </tr>
-                {% for value in stats %}
+                {% for value in population_by_year %}
                 <tr>
                     <td>{{ value.year }}</td>
-                    <td>{{ value.age }}</td>
-                    <td>{{ value.gender }}</td>
                     <td>{{ value.population }}</td>
+                    <td>{{ value.male }}</td>
+                    <td>{{ value.female }}</td>
                 </tr>
                 {% endfor %}
             </table>
