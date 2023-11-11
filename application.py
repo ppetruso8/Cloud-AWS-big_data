@@ -11,7 +11,7 @@ application = app = Flask(__name__)
 def index():
     # source: https://realpython.com/api-integration-in-python/
     # API URL to fetch data
-    api_url = "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/FY002/JSON-stat/2.0/en"
+    api_url = "https://ws.cso.ie/public/api.restful/PxStat.Data.Cube_API.ReadDataset/F1001/JSON-stat/2.0/en"
     # fetch data and process into a list
     data = get_data(api_url)
     population_by_year = process_data(data)
@@ -21,6 +21,7 @@ def index():
     most_populated_year, most_population = get_most_population(population_by_year)
     median_population = get_median(population_by_year)
     total_growth, total_growth_percentage = get_total_growth(population_by_year)
+    recovery_growth, recovery_growth_percentage = get_growth_since_recovery(population_by_year)
 
     '''DB'''
     # establish connection to the database
@@ -42,16 +43,17 @@ def index():
                                 total_population INT,
                                 male_population INT,
                                 female_population INT,
-                                most_populous_age_group VARCHAR(20),
-                                most_populous_age_group_population INT
+                                most_populous_county VARCHAR(20),
+                                most_populous_county_population INT
                                 );""")
 
         # insert values into the table 
         for yr in population_by_year: 
-            cursor.execute("""INSERT INTO population_by_year (year, total_population, male_population, female_population, most_populous_age_group, most_populous_age_group_population)
+            cursor.execute("""INSERT INTO population_by_year (year, total_population, male_population,\
+                            female_population, most_populous_county, most_populous_county_population)
                             VALUES (%s, %s, %s, %s, %s, %s);""", 
                             (yr['year'], yr['population'], yr['male'], yr['female'], 
-                             yr['most_populous_age_group'], yr['most_populous_age_group_population']))
+                             yr['most_populous_county'], yr['most_populous_county_population']))
             connection.commit()
 
     except pymysql.Error as e:
@@ -66,13 +68,18 @@ def index():
                         median_population INT,
                         population_growth INT,
                         population_growth_percentage FLOAT,
+                        recovery_growth INT,
+                        recovery_growth_percentage FLOAT,
                         most_populated_year VARCHAR(4),
                         most_population INT
                         );""")
         # insert values into the table
-        cursor.execute("""INSERT INTO general_stats (avg_population, median_population, population_growth, population_growth_percentage, most_populated_year, most_population)
-                       VALUES (%s, %s, %s, %s, %s, %s);""", 
-                       (avg_population, median_population, total_growth, total_growth_percentage, most_populated_year, most_population))
+        cursor.execute("""INSERT INTO general_stats (avg_population, median_population,\
+                        population_growth, population_growth_percentage, recovery_growth,\
+                        recovery_growth_percentage, most_populated_year, most_population)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s);""", 
+                       (avg_population, median_population, total_growth, total_growth_percentage,
+                         recovery_growth, recovery_growth_percentage, most_populated_year, most_population))
         connection.commit()
 
     except pymysql.Error as e:
@@ -85,7 +92,9 @@ def index():
     # render index.html template with data
     return render_template("index.html", population_by_year=population_by_year, avg_population=avg_population,
                            median_population=median_population, most_populated_year=most_populated_year, 
-                           most_population=most_population, total_growth=total_growth, total_growth_percentage=total_growth_percentage)
+                           most_population=most_population, total_growth=total_growth, 
+                           total_growth_percentage=total_growth_percentage, recovery_growth=recovery_growth, 
+                           recovery_growth_percentage=recovery_growth_percentage)
 
 # function for fetching data from API url
 def get_data(url):
@@ -102,9 +111,9 @@ def process_data(data):
     '''
     data -- dictionary containing fetched data from API 
     '''
-    # extract years, ages, genders and population from data
+    # extract years, counties, genders and population from data
     years = data["dimension"]["TLIST(A1)"]["category"]["label"]
-    ages = data["dimension"]["C02076V03371"]["category"]["label"]
+    counties = data["dimension"]["C02779V03348"]["category"]["label"]
     genders = data["dimension"]["C02199V02655"]["category"]["label"]
     population = data["value"]
 
@@ -116,16 +125,16 @@ def process_data(data):
 
     # process data and organize by year
     for year in years.values():
-        # store population of age groups for year
-        age_group_population = {}
-        for age in ages.values():
+        # store population of counties for year
+        county_population = {}
+        for county in counties.values():
             for gender in genders.values():
-                # get each age group population
-                if age != "All ages" and gender == "Both sexes":
-                    age_group_population[age] = int(population[value_index])
+                # get each county population
+                if county != "State" and gender == "Both sexes":
+                    county_population[county] = int(population[value_index])
 
                 # get total population by year
-                if age == "All ages": 
+                if county == "State": 
                     # organize data by gender 
                     if gender == "Both sexes":
                         population_by_year.append({
@@ -140,13 +149,13 @@ def process_data(data):
                 # increment current position in "population"
                 value_index += 1
 
-        # get the most populous age group and its population for year    
-        most_populous_age_group = max(age_group_population, key=age_group_population.get)
-        most_populous_age_group_population = age_group_population[most_populous_age_group]
+        # get the most populous county and its population for year    
+        most_populous_county = max(county_population, key=county_population.get)
+        most_populous_county_population = county_population[most_populous_county]
 
-        # store most populous age group and its population in list
-        population_by_year[year_index]["most_populous_age_group"] = most_populous_age_group
-        population_by_year[year_index]["most_populous_age_group_population"] = most_populous_age_group_population
+        # store most populous county and its population in list
+        population_by_year[year_index]["most_populous_county"] = most_populous_county
+        population_by_year[year_index]["most_populous_county_population"] = most_populous_county_population
 
         # increment current position in "population_by_year" list
         year_index +=1
@@ -220,6 +229,25 @@ def get_total_growth(population_data):
     total_growth_percentage = round(((total_growth / first_year_population) * 100), 2)
 
     return (total_growth, total_growth_percentage)
+
+# function to get the growth of the population after establishing the Irish Free State
+def get_growth_since_recovery(population_data):
+    '''
+    population_data -- list containing population data by year
+    '''
+    for entry in population_data:
+        if entry["year"] == "1926":
+            free_state_population = entry["population"]
+            break
+
+    last_year_population = population_data[-1]["population"]
+
+    # calculate growth since establishing the Irish Free State
+    recovery_growth = last_year_population - free_state_population
+    recovery_growth_percentage = round(((recovery_growth / free_state_population) * 100), 2)
+
+    return (recovery_growth, recovery_growth_percentage)
+
 
 # start the Flask web application
 if __name__ == "__main__":

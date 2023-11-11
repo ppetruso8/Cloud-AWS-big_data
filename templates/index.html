@@ -25,8 +25,8 @@
                     <th>Total Population</th>
                     <th>Total Male</th>
                     <th>Total Female</th>
-                    <th>Most Populous Age Group</th>
-                    <th>Most Populous Age Group's Population</th>
+                    <th>Most Populated County</th>
+                    <th>Most Populated County's Population</th>
                 </tr>
                 {% for value in population_by_year %}
                 <tr>
@@ -34,8 +34,8 @@
                     <td>{{ value.population }}</td>
                     <td>{{ value.male }}</td>
                     <td>{{ value.female }}</td>
-                    <td>{{ value.most_populous_age_group }}</td>
-                    <td>{{ value.most_populous_age_group_population }}</td>
+                    <td>{{ value.most_populous_county }}</td>
+                    <td>{{ value.most_populous_county_population }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -43,14 +43,22 @@
             <h2>General Statistics</h2>
             <table>
                 <tr>
+                    <th>Most Populated Year</th>
+                    <th>Population in Most Populated Year</th>
                     <th>Average Population</th>
                     <th>Median Population</th>
                     <th>Total Population Growth</th>
-                    <th>Total Population Growth Percentage</th>
-                    <th>Most Populated Year</th>
-                    <th>Population in Most Populated Year</th>
+                    <th>Total Population Growth (%)</th>
+                    <th>Population Growth Since Recovery*</th>
+                    <th>Population Growth Since Recovery (%)</th>
                 </tr>
                 <tr>
+                    <td>
+                        {{ most_populated_year }}
+                    </td>
+                    <td>
+                        {{ most_population }}
+                    </td>
                     <td>
                         {{ avg_population }}
                     </td>
@@ -64,13 +72,18 @@
                         {{ total_growth_percentage }}
                     </td>
                     <td>
-                        {{ most_populated_year }}
+                        {{ recovery_growth }}
                     </td>
                     <td>
-                        {{ most_population }}
+                        {{ recovery_growth_percentage }}
                     </td>
                 </tr>
             </table>
+
+            <p>
+                *The population growth since the first census (1926) after the establishment of the Irish Free State, indicating 
+                Ireland's demographic recovery and growth.
+            </p>
             
         </main>
 
