@@ -1,0 +1,103 @@
+@viewport {
+    width: device-width;
+}
+
+@font-face {
+    font-family: Montserrat;
+    src: url("fonts/Montserrat/Montserrat-Regular.ttf");
+}
+
+
+html {
+    background-color: rgb(243,243,243);
+
+    scroll-behavior: smooth;
+}
+
+body {
+    width: auto;
+    margin: 0;
+    padding: 0;
+
+    line-height: 1.5;
+    color: rgb(11,12,16);
+    font-family: "Montserrat", "Segoe UI", sans-serif;
+    hyphens: auto;
+}
+
+header {
+    width: auto;
+    padding: 1em;
+
+    background-color: #28363D;
+    color: #DEE1DD;
+
+    text-align: center;
+    font-size: 1.5em;
+}
+
+h1 {
+    margin: 0;
+}
+
+main {
+    margin: 2em;
+}
+
+table {
+    width: 100%;
+    margin: auto 1em;
+
+    border-collapse: collapse;
+
+    text-align: center;
+}
+
+th {
+    padding: 10px;
+    border: 1px solid rgb(37,37,37);
+
+    background: #6D9197;
+    color: rgb(243,243,243);
+}
+
+td {
+    padding: 10px;
+    border: 1px solid rgb(37,37,37);
+
+    background: #DEE1DD;
+}
+
+tr:nth-child(even) {
+    background: rgb(17, 218, 218);
+}
+
+footer {
+    width: auto;
+    padding: 0.5em;
+
+    background-color: #28363D;
+    color: rgb(243,243,243);
+
+    text-align: center;
+}
+
+footer a {
+    color: rgb(209,224,224);
+}
+
+h2 {
+    margin: 2em 10px 0.5em 10px;
+}
+
+p {
+    margin: 1em 10px;
+}
+
+small {
+    font-size: 0.75em;
+}
+
+i {
+    font-style: italic;
+}

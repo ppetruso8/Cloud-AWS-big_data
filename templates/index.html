@@ -3,19 +3,15 @@
     <head>
         <meta charset="utf-8" />
         <title>Census Population Statistics</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+        {% block stylesheets %}{% endblock %}
     </head>
 
     <body>
         <header>
             <h1>Census Population Statistics</h1>
         </header>
-    
 
-        <nav>
-            <ul>
-                
-            </ul> 
-        </nav>
 
         <main>
             <h2>Total Population Statistics</h2>
@@ -23,19 +19,19 @@
                 <tr>
                     <th>Year</th>
                     <th>Total Population</th>
-                    <th>Total Male</th>
-                    <th>Total Female</th>
+                    <th>Total Male Population</th>
+                    <th>Total Female Population</th>
                     <th>Most Populated County</th>
                     <th>Most Populated County's Population</th>
                 </tr>
                 {% for value in population_by_year %}
                 <tr>
                     <td>{{ value.year }}</td>
-                    <td>{{ value.population }}</td>
-                    <td>{{ value.male }}</td>
-                    <td>{{ value.female }}</td>
+                    <td class="millions">{{ value.population }}</td>
+                    <td class="millions">{{ value.male }}</td>
+                    <td class="millions">{{ value.female }}</td>
                     <td>{{ value.most_populous_county }}</td>
-                    <td>{{ value.most_populous_county_population }}</td>
+                    <td class="millions">{{ value.most_populous_county_population }}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -56,26 +52,26 @@
                     <td>
                         {{ most_populated_year }}
                     </td>
-                    <td>
+                    <td class="millions">
                         {{ most_population }}
                     </td>
-                    <td>
+                    <td class="millions">
                         {{ avg_population }}
                     </td>
-                    <td>
+                    <td class="millions">
                         {{ median_population }}
                     </td>
-                    <td>
+                    <td class="millions">
                         {{ total_growth }}
                     </td>
                     <td>
-                        {{ total_growth_percentage }}
+                        {{ total_growth_percentage }}%
                     </td>
-                    <td>
+                    <td class="millions">
                         {{ recovery_growth }}
                     </td>
                     <td>
-                        {{ recovery_growth_percentage }}
+                        {{ recovery_growth_percentage }}%
                     </td>
                 </tr>
             </table>
@@ -91,16 +87,18 @@
             <p>
                 <small>The website was created by <i>Petra Petrusova</i>.</small>
             </p>
-            <!--
-            <p>
-                <small>The font is made available for free use on <a href="https://fonts.google.com/">https://fonts.google.com/</a>.</small>
-            </p>-->
             
             <p>
-                <small>Statistics: <a href="https://data.cso.ie/table/FY002">Central Statistics Office</a></small>
+                <small>The font is made available for free use on <a href="https://fonts.google.com/">https://fonts.google.com/</a>.</small>
+            </p>
+            
+            <p>
+                <small>Statistics Source: <a href="https://data.cso.ie/table/F1001">Central Statistics Office</a></small>
             </p>
             
         </footer>
 
+        <!-- JS function to format millions for improved readability -->
+        <script src="{{ url_for('static', filename='formatting.js') }}"></script>
     </body>
 </html>
